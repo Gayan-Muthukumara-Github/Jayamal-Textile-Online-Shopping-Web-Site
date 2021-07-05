@@ -53,10 +53,10 @@ if (isset($_POST['addfeedback'])) {
     $user_query_run = mysqli_query($con, $user_query);
 
     if ($user_query_run) {
-        $_SESSION['status'] = "Sent your";
+        $_SESSION['status'] = "Sent your feedback";
         header("Location: feedback.php");
     } else {
-        $_SESSION['status'] = "Failed to sending";
+        $_SESSION['status'] = "Failed to sending your feedback";
         header("Location: feedback.php");
     }
 }
@@ -600,6 +600,47 @@ if (isset($_POST['AddCuniform'])) {
     
 
 }
+?>
+<?php
+include('config/dbcon.php');
+if(isset($_POST['action']))
+{
+    $sql = "SELECT * FROM uniform";
+
+    if(isset($_POST['uniform']))
+    {
+        $uniform = implode("','", $_POST['uniform']);
+        $sql .= "AND c_name IN('".$uniform."')";
+    }
+
+    $result = $con->query($sql);
+    $output = "";
+
+    if($result->num_rows>0)
+    {
+        while($row=$result->fetch_assoc())
+        {
+            $output .='<div class="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
+            <div class="block-4 text-center border">
+              <figure class="block-4-image">
+              </figure>
+              <div class="block-4-text p-4">
+                <h3><a href="uniform-single.php">'.$uni['u_name'].'</a></h3>
+                <p class="mb-0">'.$uni['u_description'].'</p>
+
+              </div>
+            </div>
+          </div>';
+        }
+    }
+    else 
+    {
+        $output ="<h3>No Uniform</h3>";
+    }
+    echo $output;
+}
+
+
 ?>
 
 

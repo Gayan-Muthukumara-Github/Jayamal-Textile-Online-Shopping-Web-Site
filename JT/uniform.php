@@ -210,7 +210,7 @@ include('config/dbcon.php');
             <div class="row">
               <div class="col-md-12 mb-5">
                 <div class="float-md-left mb-4">
-                  <h2 class="text-black h5">Shop All</h2>
+                  <h2 class="text-black h5" id="textChange">Shop All</h2>
                 </div>
                 <div class="d-flex">
                   <div class="dropdown mr-1 ml-md-auto">
@@ -237,7 +237,7 @@ include('config/dbcon.php');
                 </div>
               </div>
             </div>
-            <div class="row mb-5">
+            <div class="row mb-5" id="result">
               <?php
 
               $query = "SELECT * FROM uniform";
@@ -251,7 +251,7 @@ include('config/dbcon.php');
                   <div class="col-sm-6 col-lg-4 mb-4" data-aos="fade-up">
                     <div class="block-4 text-center border">
                       <figure class="block-4-image">
-                        <a href="uniform-single.php?uniform_id=<?php echo $uni['uniform_ID']; ?>"><?php echo '<img src="data:image;base64,' . base64_encode($uni['u_image']) . '" alt="Image placeholder" class="img-fluid">'; ?></a>
+                        <a href="uniform-single.php?uniform_id=<?php echo $uni['uniform_ID']; ?>"><?php echo '<img src="data:image;base64,' . base64_encode($uni['u_image']) . '" alt="Image placeholder" class="img-fluid" style="width: 250px;height:250px;">'; ?></a>
                       </figure>
                       <div class="block-4-text p-4">
                         <h3><a href="uniform-single.php"><?= $uni['u_name'] ?></a></h3>
@@ -287,50 +287,34 @@ include('config/dbcon.php');
             </div>
           </div>
 
-          <div class="col-md-3 order-1 mb-5 mb-md-0">
+          <div class="col-md-3 order-1 mb-5 mb-md-0" >
             <div class="border p-4 rounded mb-4">
-              <h3 class="mb-3 h6 text-uppercase text-black d-block">Categories</h3>
+              <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter by Categories</h3>
               <ul class="list-unstyled mb-0">
-                <li class="mb-1"><a href="#" class="d-flex"><span>Pre school frock</span> </a></li>
-                <li class="mb-1"><a href="#" class="d-flex"><span>School frock</span> </span></a></li>
-                <li class="mb-1"><a href="#" class="d-flex"><span>Skirt</span> </a></li>
-                <li class="mb-1"><a href="#" class="d-flex"><span>Shirt</span> </a></li>
-                <li class="mb-1"><a href="#" class="d-flex"><span>Short</span> </span></a></li>
-                <li class="mb-1"><a href="#" class="d-flex"><span>Trouser</span> </a></li>
+              <?php
+
+              $query = "SELECT c_name FROM categoryprice";
+              $query_run = mysqli_query($con, $query);
+
+              if (mysqli_num_rows($query_run) > 0) {
+                foreach ($query_run as $cnm) {
+              ?>
+              <li>
+              <input type="checkbox" id="uniform" class="mb-1 from-check-input uniform_check "  value="<?php echo $cnm['c_name']; ?>"> <span class="text-dark">  <?php echo $cnm['c_name']; ?></span>
+
+              </li>
+                <?php
+                }
+              } else {
+                ?>
+                <P>No Record Found</p>
+              <?php
+              }
+              ?>
               </ul>
             </div>
 
-            <div class="border p-4 rounded mb-4">
-              <div class="mb-4">
-                <h3 class="mb-3 h6 text-uppercase text-black d-block">Filter by Size</h3>
-                <div id="slider-range" class="border-primary"></div>
-                <input type="text" name="text" id="amount" class="form-control border-0 pl-0 bg-white" disabled="" />
-              </div>
-
-              <div class="mb-4">
-                <label for="s_sm" class="d-flex">
-                  <input type="checkbox" id="s_sm" class="mr-2 mt-1"> <span class="text-black">Size 2</span>
-                </label>
-                <label for="s_md" class="d-flex">
-                  <input type="checkbox" id="s_md" class="mr-2 mt-1"> <span class="text-black">Size 4</span>
-                </label>
-                <label for="s_lg" class="d-flex">
-                  <input type="checkbox" id="s_lg" class="mr-2 mt-1"> <span class="text-black">Size 6</span>
-                </label>
-                <label for="s_sm" class="d-flex">
-                  <input type="checkbox" id="s_sm" class="mr-2 mt-1"> <span class="text-black">Size 8</span>
-                </label>
-                <label for="s_md" class="d-flex">
-                  <input type="checkbox" id="s_md" class="mr-2 mt-1"> <span class="text-black">Size 10</span>
-                </label>
-                <label for="s_lg" class="d-flex">
-                  <input type="checkbox" id="s_lg" class="mr-2 mt-1"> <span class="text-black">Size 12</span>
-                </label>
-              </div>
-
-
-
-            </div>
+            
           </div>
         </div>
 
@@ -419,6 +403,39 @@ include('config/dbcon.php');
       }
     });
   </script>
+<script type="text/javascript">
+  $(document).ready(function(){
+
+    $(".uniform_check").click(function(){
+
+      var action = 'data';
+      var uniform = get_filter_text('uniform');
+
+      $.ajax({
+        url: 'code.php',
+        method: 'POST',
+        data: {
+          action:action,
+          uniform:uniform
+          },
+        success:function(response){
+          $("#result").html(response);
+          $("#textChange").text("Filtered Uniform");
+        }
+
+    });
+
+    function get_filter_text(text_id){
+      var filterData = [];
+      $('#'+text_id+':checked').each(function(){
+        filterData.push($(this).val());
+      });
+      return filterData;
+    }
+
+  });
+</script>
+
 
 </body>
 
